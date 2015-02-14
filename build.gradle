@@ -16,6 +16,7 @@ dependencies {
   compile "xml-apis:xml-apis:1.4.01"
   
   // Gotta make commons-modeler non-transitive so it doesn't import xml-apis 2.0.2, which breaks mlcp
+  // Issue is in bugtrack, #31294
   compile('com.marklogic:mlcp-Hadoop2:1.2-3') {
     exclude module:"commons-modeler"
     exclude module:"hadoop-deps"
@@ -32,26 +33,15 @@ dependencies {
   compile "log4j:log4j:1.2.17"
 }
 
-ext {
-  pubVersion = project.hasProperty("pubVersion") ? project.getProperty("pubVersion") : "CHANGEME"
-}
- 
 publishing {
   publications {
     mainJava(MavenPublication) {
-      groupId 'com.marklogic.camel'
-      artifactId getProject().getName()
-      version pubVersion
       from components.java
     }
   }
   repositories {
     maven {
-      //if (!pubVersion.contains("SNAPSHOT")) {
-        //url "file://$projectDir/../../gh-pages-marklogic-java/releases"
-      //} else {
-        url mavenLocal().url
-      //}
+      url "file://$projectDir/../gh-pages-marklogic-java/releases"
     }
   }
 }
