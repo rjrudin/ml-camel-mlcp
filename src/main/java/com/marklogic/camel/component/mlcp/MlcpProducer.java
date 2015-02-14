@@ -12,8 +12,10 @@ import com.marklogic.contentpump.ContentPump;
 import com.marklogic.contentpump.utilities.OptionsFileUtil;
 
 /**
- * Currently dependent on a File component being the consumer that feeds into this endpoint, as it's looking for a
- * message header set by the File component.
+ * This does the actual work of building a list of arguments and then invoking Content Pump with them.
+ * <p>
+ * Since the input to Content Pump is a file or a directory, this producer assumes that the consumer at the other end of
+ * the route is a Camel File component.
  */
 public class MlcpProducer extends DefaultProducer {
 
@@ -26,34 +28,39 @@ public class MlcpProducer extends DefaultProducer {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        Message msg = exchange.getIn();
-        
-        log.info(msg.getHeaders().toString());
+        List<String> argList = buildListOfCommonArgs();
+        addQuerystringParamsToArgList(argList);
+        addInputFilePathToArgList(argList, exchange);
+        invokeContentPump(argList);
+    }
 
-        /**
-         * This approaches considers 3 sets of MLCP params - the host/port in the URI; the params following the
-         * querystring (which are often static but could be dynamic); and the params based on the incoming Message.
-         */
-        List<String> argList = new ArrayList<String>();
-        argList.add("IMPORT");
-        argList.add("-host");
-        argList.add(endpoint.getHost());
-        argList.add("-port");
-        argList.add(endpoint.getPort() + "");
+    protected List<String> buildListOfCommonArgs() {
+        List<String> l = new ArrayList<String>();
+        l.add("IMPORT");
+        l.add("-host");
+        l.add(endpoint.getHost());
+        l.add("-port");
+        l.add(endpoint.getPort() + "");
+        return l;
+    }
 
+    protected void addQuerystringParamsToArgList(List<String> argList) {
         Map<String, Object> params = endpoint.getMlcpParams();
         for (String key : params.keySet()) {
             argList.add("-" + key);
             argList.add(params.get(key).toString());
         }
-        argList.add("-input_file_path");
-        argList.add(msg.getHeader("CamelFilePath").toString());
-
-        String[] args = argList.toArray(new String[] {});
-        log.info("args: " + argList);
-        String[] expandedArgs = OptionsFileUtil.expandArguments(args);
-
-        ContentPump.runCommand(expandedArgs);
     }
 
+    protected void addInputFilePathToArgList(List<String> argList, Exchange exchange) {
+        Message msg = exchange.getIn();
+        argList.add("-input_file_path");
+        argList.add(msg.getHeader("CamelFilePath").toString());
+    }
+
+    protected void invokeContentPump(List<String> argList) throws Exception {
+        String[] args = argList.toArray(new String[] {});
+        String[] expandedArgs = OptionsFileUtil.expandArguments(args);
+        ContentPump.runCommand(expandedArgs);
+    }
 }

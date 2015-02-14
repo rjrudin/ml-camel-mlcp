@@ -6,15 +6,25 @@ import java.util.Map;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
-import org.apache.camel.impl.DefaultConsumer;
 import org.apache.camel.impl.DefaultEndpoint;
 
+/**
+ * Camel endpoint that has the job of instantiating an MlcpProducer.
+ */
 public class MlcpEndpoint extends DefaultEndpoint {
 
     private String host;
     private int port;
     private Map<String, Object> mlcpParams;
 
+    /**
+     * @param uri
+     * @param remaining
+     *            Expected to be of the form "localhost:8003", for example.
+     * @param component
+     * @param params
+     *            This map of parameters will be passed into Content Pump as a list of argument.
+     */
     public MlcpEndpoint(String uri, String remaining, MlcpComponent component, Map<String, Object> params) {
         super(uri, component);
 
@@ -22,9 +32,14 @@ public class MlcpEndpoint extends DefaultEndpoint {
         this.host = tokens[0];
         this.port = Integer.parseInt(tokens[1]);
 
+        // Need to make a copy of the map; Camel apparently clears out the params map that is passed in
         mlcpParams = new HashMap<String, Object>(params);
     }
 
+    /**
+     * Allow for the component URI querystring to specify any MLCP params without having to declare them on this
+     * endpoint. That makes life easier when it's time to build the list of arguments to pass into MLCP.
+     */
     @Override
     public boolean isLenientProperties() {
         return true;
@@ -32,13 +47,16 @@ public class MlcpEndpoint extends DefaultEndpoint {
 
     @Override
     public Producer createProducer() throws Exception {
-        System.out.println("CreateProducer: " + mlcpParams);
         return new MlcpProducer(this);
     }
 
+    /**
+     * Content Pump can only be a producer (which in Camel means something on the "to" end of a route), and Camel seems
+     * fine with null being returned here.
+     */
     @Override
     public Consumer createConsumer(Processor p) throws Exception {
-        return new DefaultConsumer(this, p);
+        return null;
     }
 
     @Override
