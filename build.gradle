@@ -1,0 +1,58 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'eclipse'
+
+repositories {
+  mavenCentral()
+  maven {url "http://developer.marklogic.com/maven2/"}
+  maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
+}
+
+dependencies {
+  compile "org.apache.camel:camel-context:2.14.1"
+  compile "org.apache.camel:camel-core:2.14.1"
+  
+  // Calling this out explicitly, 2.0.2 is winning when the pom is built  
+  compile "xml-apis:xml-apis:1.4.01"
+  
+  // Gotta make commons-modeler non-transitive so it doesn't import xml-apis 2.0.2, which breaks mlcp
+  compile('com.marklogic:mlcp-Hadoop2:1.2-3') {
+    exclude module:"commons-modeler"
+    exclude module:"hadoop-deps"
+  }
+  compile('commons-modeler:commons-modeler:2.0') {
+    transitive = false
+  }
+
+  // Depending on this separately, otherwise the "eclipse" task generates a .classpath file that Eclipse doesn't like
+  compile "com.marklogic:hadoop-deps:2"
+  
+  compile "org.slf4j:slf4j-api:1.7.7"
+  compile "org.slf4j:slf4j-log4j12:1.7.7"
+  compile "log4j:log4j:1.2.17"
+}
+
+ext {
+  pubVersion = project.hasProperty("pubVersion") ? project.getProperty("pubVersion") : "CHANGEME"
+}
+ 
+publishing {
+  publications {
+    mainJava(MavenPublication) {
+      groupId 'com.marklogic.camel'
+      artifactId getProject().getName()
+      version pubVersion
+      from components.java
+    }
+  }
+  repositories {
+    maven {
+      //if (!pubVersion.contains("SNAPSHOT")) {
+        //url "file://$projectDir/../../gh-pages-marklogic-java/releases"
+      //} else {
+        url mavenLocal().url
+      //}
+    }
+  }
+}
+ 
