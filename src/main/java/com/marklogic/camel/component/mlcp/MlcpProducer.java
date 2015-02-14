@@ -61,6 +61,21 @@ public class MlcpProducer extends DefaultProducer {
     protected void invokeContentPump(List<String> argList) throws Exception {
         String[] args = argList.toArray(new String[] {});
         String[] expandedArgs = OptionsFileUtil.expandArguments(args);
+        if (log.isDebugEnabled()) {
+            debugContentPumpArgs(expandedArgs);
+        }
         ContentPump.runCommand(expandedArgs);
+    }
+
+    protected void debugContentPumpArgs(String[] args) {
+        List<String> argList = new ArrayList<String>();
+        for (int i = 0; i < args.length; i++) {
+            if ("-password".equals(args[i]) && (i + 1 <= args.length)) {
+                i++;
+                continue;
+            }
+            argList.add(args[i]);
+        }
+        log.debug("Invoking Content Pump with args (not showing password): " + argList);
     }
 }

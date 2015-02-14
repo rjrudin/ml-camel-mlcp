@@ -7,11 +7,15 @@ import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultEndpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Camel endpoint that has the job of instantiating an MlcpProducer.
  */
 public class MlcpEndpoint extends DefaultEndpoint {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MlcpEndpoint.class);
 
     private String host;
     private int port;
@@ -27,13 +31,20 @@ public class MlcpEndpoint extends DefaultEndpoint {
      */
     public MlcpEndpoint(String uri, String remaining, MlcpComponent component, Map<String, Object> params) {
         super(uri, component);
+        setHostAndPort(remaining);
+        
+        // Need to make a copy of the map; Camel apparently clears out the params map that is passed in
+        mlcpParams = new HashMap<String, Object>(params);
+    }
 
+    protected void setHostAndPort(String remaining) {
         String[] tokens = remaining.split(":");
         this.host = tokens[0];
         this.port = Integer.parseInt(tokens[1]);
 
-        // Need to make a copy of the map; Camel apparently clears out the params map that is passed in
-        mlcpParams = new HashMap<String, Object>(params);
+        if (LOG.isInfoEnabled()) {
+            LOG.info(String.format("Content Pump will connect to %s:%d", this.host, this.port));
+        }
     }
 
     /**
