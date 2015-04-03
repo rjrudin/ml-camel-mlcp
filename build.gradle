@@ -9,8 +9,8 @@ repositories {
 }
 
 dependencies {
-  compile "org.apache.camel:camel-context:2.14.1"
-  compile "org.apache.camel:camel-core:2.14.1"
+  compile "org.apache.camel:camel-context:2.15.1"
+  compile "org.apache.camel:camel-core:2.15.1"
   
   // Calling this out explicitly, 2.0.2 is winning when the pom is built  
   compile "xml-apis:xml-apis:1.4.01"
