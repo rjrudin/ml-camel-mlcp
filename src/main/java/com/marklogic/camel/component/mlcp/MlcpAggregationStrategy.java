@@ -18,4 +18,12 @@ public class MlcpAggregationStrategy implements AggregationStrategy {
         newExchange.getIn().setHeader("CamelFilePath", camelFilePath);
         return newExchange;
     }
+
+    public String getCamelFilePath() {
+        return camelFilePath;
+    }
+
+    public void setCamelFilePath(String camelFilePath) {
+        this.camelFilePath = camelFilePath;
+    }
 }
