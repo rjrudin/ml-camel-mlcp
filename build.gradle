@@ -12,25 +12,12 @@ dependencies {
   compile "org.apache.camel:camel-context:2.15.1"
   compile "org.apache.camel:camel-core:2.15.1"
   
-  // Calling this out explicitly, 2.0.2 is winning when the pom is built  
-  compile "xml-apis:xml-apis:1.4.01"
-  
-  // Gotta make commons-modeler non-transitive so it doesn't import xml-apis 2.0.2, which breaks mlcp
-  // Issue is in bugtrack, #31294
-  compile('com.marklogic:mlcp-Hadoop2:1.2-3') {
-    exclude module:"commons-modeler"
+  compile ("com.marklogic:mlcp-Hadoop2:1.3-2") {
     exclude module:"hadoop-deps"
-  }
-  compile('commons-modeler:commons-modeler:2.0') {
-    transitive = false
   }
 
   // Depending on this separately, otherwise the "eclipse" task generates a .classpath file that Eclipse doesn't like
   compile "com.marklogic:hadoop-deps:2"
-  
-  compile "org.slf4j:slf4j-api:1.7.7"
-  compile "org.slf4j:slf4j-log4j12:1.7.7"
-  compile "log4j:log4j:1.2.17"
 }
 
 publishing {
