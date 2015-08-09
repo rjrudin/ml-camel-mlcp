@@ -1,4 +1,4 @@
-package com.marklogic.camel.component.mlcp;
+package com.rjrudin.marklogic.camel.component.mlcp;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.processor.aggregate.AggregationStrategy;

@@ -1,4 +1,4 @@
-package com.marklogic.camel.component.mlcp;
+package com.rjrudin.marklogic.camel.component.mlcp;
 
 import java.util.HashMap;
 import java.util.Map;
