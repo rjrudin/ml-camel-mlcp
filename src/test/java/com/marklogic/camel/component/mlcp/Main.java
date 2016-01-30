@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         CamelContext context = new DefaultCamelContext();
 
-        final String mlcpUri = "mlcp:localhost:8003?username=admin&password=admin&output_collections=test-collection";
+        final String mlcpUri = "mlcp:localhost:8000?username=admin&password=admin&output_collections=test-collection";
         final String inboxUri = "file:///c:/temp/camel-sandbox/inbox";
 
         // final String marklogicDocsUri =

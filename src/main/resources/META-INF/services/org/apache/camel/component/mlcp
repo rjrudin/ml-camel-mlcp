@@ -1,1 +1,1 @@
-class=com.rjrudin.marklogic.camel.component.mlcp.MlcpComponent
+class=com.marklogic.camel.component.mlcp.MlcpComponent
